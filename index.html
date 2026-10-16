@@ -8,7 +8,7 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, doc, deleteDoc, onSnapshot, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const firebaseConfig = {
   apiKey: "AIzaSyAQr3yQ9U6E2OQ4u4g1v2x3y4z5a6b7c8d9e",
   authDomain: "fsy-2027.firebaseapp.com",
@@ -20,7 +20,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 window.db = db;
-window.fb = { collection, doc, setDoc, deleteDoc, onSnapshot, addDoc };
+window.fb = { collection, doc, deleteDoc, onSnapshot, addDoc };
 </script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -32,19 +32,19 @@ body{font-family:'Inter',sans-serif}
 <div class="max-w-6xl mx-auto p-4 md:p-6">
   <header class="bg-white rounded-2xl p-5 shadow-sm flex justify-between items-center mb-6">
     <div>
-      <h1 class="text-2xl font-bold">FSY 2027</h1>
+      <h1 class="text-2xl font-bold">FSY 2027 <i class="fa-solid fa-fire text-orange-500 ml-1"></i></h1>
       <p class="text-sm text-green-600 font-semibold"><i class="fa-solid fa-circle text-[8px] animate-pulse"></i> ONLINE - Sincronizado para toda equipe</p>
     </div>
     <button onclick="document.getElementById('modalEquipe').classList.remove('hidden')" class="bg-black text-white px-4 py-2 rounded-xl text-sm"><i class="fa-solid fa-plus"></i> Equipe</button>
   </header>
   <div class="flex gap-2 mb-6 overflow-x-auto">
-    <button onclick="showTab('jovens')" id="btn-jovens" class="tab-btn bg-black text-white px-5 py-2.5 rounded-xl text-sm font-semibold">Jovens</button>
-    <button onclick="showTab('companhias')" id="btn-companhias" class="tab-btn bg-white px-5 py-2.5 rounded-xl text-sm font-semibold">Companhias</button>
-    <button onclick="showTab('agenda')" id="btn-agenda" class="tab-btn bg-white px-5 py-2.5 rounded-xl text-sm font-semibold">Agenda</button>
-    <button onclick="showTab('equipe')" id="btn-equipe" class="tab-btn bg-white px-5 py-2.5 rounded-xl text-sm font-semibold">Equipe</button>
+    <button onclick="showTab('jovens')" id="btn-jovens" class="tab-btn bg-white px-5 py-2.5 rounded-xl text-sm font-semibold"><i class="fa-solid fa-users mr-1"></i> Jovens</button>
+    <button onclick="showTab('companhias')" id="btn-companhias" class="tab-btn bg-white px-5 py-2.5 rounded-xl text-sm font-semibold"><i class="fa-solid fa-flag mr-1"></i> Companhias</button>
+    <button onclick="showTab('agenda')" id="btn-agenda" class="tab-btn bg-white px-5 py-2.5 rounded-xl text-sm font-semibold"><i class="fa-solid fa-calendar mr-1"></i> Agenda</button>
+    <button onclick="showTab('equipe')" id="btn-equipe" class="tab-btn bg-black text-white px-5 py-2.5 rounded-xl text-sm font-semibold"><i class="fa-solid fa-user-tie mr-1"></i> Equipe</button>
   </div>
-  <div id="tab-jovens"></div>
-  <div id="tab-equipe" class="hidden space-y-8">
+  <div id="tab-jovens" class="hidden"><div class="bg-white rounded-2xl p-8 text-center text-gray-400">Jovens em breve</div></div>
+  <div id="tab-equipe" class="space-y-6">
     <div class="bg-white rounded-2xl p-5 shadow-sm border-l-4 border-l-purple-600">
       <div class="bloco-titulo bg-purple-100 text-purple-800"><i class="fa-solid fa-crown mr-2"></i> CASAL DIRETOR</div>
       <div id="lista-casal-diretor" class="grid md:grid-cols-2 gap-3"></div>
@@ -59,32 +59,63 @@ body{font-family:'Inter',sans-serif}
     </div>
     <div class="bg-white rounded-2xl p-5 shadow-sm border-l-4 border-l-emerald-600">
       <div class="bloco-titulo bg-emerald-100 text-emerald-800"><i class="fa-solid fa-people-group mr-2"></i> DUPLAS DE CONSULTORES(AS)</div>
-      <div id="lista-consultores" class="grid md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+      <p class="text-[11px] text-gray-400 mb-3">Agora cadastra de dupla: rapaz + moça</p>
+      <div id="lista-consultores" class="grid md:grid-cols-2 gap-3"></div>
     </div>
   </div>
-  <div id="tab-companhias" class="hidden"></div>
-  <div id="tab-agenda" class="hidden"></div>
+  <div id="tab-companhias" class="hidden">
+    <div class="bg-white rounded-2xl p-5 shadow-sm">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold"><i class="fa-solid fa-flag mr-2 text-blue-500"></i>Companhias</h3>
+        <button onclick="document.getElementById('modalCompanhia').classList.remove('hidden'); atualizarSelectDuplas();" class="bg-blue-600 text-white px-3 py-2 rounded-xl text-xs"><i class="fa-solid fa-plus mr-1"></i> Nova Companhia</button>
+      </div>
+      <div id="lista-companhias-tab" class="grid md:grid-cols-2 gap-3"></div>
+    </div>
+  </div>
+  <div id="tab-agenda" class="hidden"><div class="bg-white rounded-2xl p-8 text-center text-gray-400">Agenda em breve</div></div>
 </div>
+
 <div id="modalEquipe" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
   <div class="bg-white rounded-2xl p-6 w-full max-w-md">
-    <h3 class="font-bold text-lg mb-4">Adicionar Membro da Equipe</h3>
-    <input id="eq-nome" placeholder="Nome completo" class="w-full border rounded-xl p-3 mb-3">
-    <select id="eq-funcao" class="w-full border rounded-xl p-3 mb-3">
+    <h3 class="font-bold text-lg mb-4" id="titulo-modal"><i class="fa-solid fa-plus mr-2"></i>Adicionar Equipe</h3>
+    <select id="eq-funcao" onchange="toggleDupla()" class="w-full border rounded-xl p-3 mb-3">
       <option value="Casal Diretor">Casal Diretor</option>
       <option value="Coordenador">Coordenador(a)</option>
       <option value="Coordenador Assistente">Coordenador(a) Assistente</option>
-      <option value="Consultor">Consultor(a)</option>
+      <option value="Consultor">Consultor(a) - DUPLA</option>
     </select>
-    <input id="eq-companhia" placeholder="Companhia / Dupla (ex: Dupla 1)" class="w-full border rounded-xl p-3 mb-4">
+    <div id="campos-simples">
+      <input id="eq-nome" placeholder="Nome completo" class="w-full border rounded-xl p-3 mb-3">
+      <input id="eq-companhia" placeholder="Companhia / Obs" class="w-full border rounded-xl p-3 mb-4">
+    </div>
+    <div id="campos-dupla" class="hidden">
+      <input id="dupla-nome" placeholder="Nome da Dupla (ex: Dupla 1)" class="w-full border rounded-xl p-3 mb-3">
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        <input id="dupla-rapaz" placeholder="Rapaz" class="w-full border rounded-xl p-3">
+        <input id="dupla-moca" placeholder="Moça" class="w-full border rounded-xl p-3">
+      </div>
+    </div>
     <div class="flex gap-2">
       <button onclick="document.getElementById('modalEquipe').classList.add('hidden')" class="flex-1 bg-gray-100 py-3 rounded-xl">Cancelar</button>
       <button onclick="salvarEquipe()" class="flex-1 bg-black text-white py-3 rounded-xl">Salvar</button>
     </div>
   </div>
 </div>
+
+<div id="modalCompanhia" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-2xl p-6 w-full max-w-md">
+    <h3 class="font-bold text-lg mb-4">Nova Companhia</h3>
+    <input id="comp-nome" placeholder="Nome da Companhia" class="w-full border rounded-xl p-3 mb-3">
+    <select id="comp-dupla" class="w-full border rounded-xl p-3 mb-4 bg-white"><option>Selecione a dupla...</option></select>
+    <div class="flex gap-2">
+      <button onclick="document.getElementById('modalCompanhia').classList.add('hidden')" class="flex-1 bg-gray-100 py-3 rounded-xl">Cancelar</button>
+      <button onclick="salvarCompanhia()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl">Criar</button>
+    </div>
+  </div>
+</div>
+
 <script>
-let equipe = [];
-let jovens = [];
+let equipe=[]; let companhias=[];
 function showTab(t){
   document.getElementById('tab-jovens').classList.add('hidden');
   document.getElementById('tab-equipe').classList.add('hidden');
@@ -94,57 +125,65 @@ function showTab(t){
   document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('bg-black','text-white'); b.classList.add('bg-white')});
   document.getElementById('btn-'+t).classList.add('bg-black','text-white');
 }
+function toggleDupla(){
+  const isDupla=document.getElementById('eq-funcao').value==='Consultor';
+  document.getElementById('campos-simples').classList.toggle('hidden',isDupla);
+  document.getElementById('campos-dupla').classList.toggle('hidden',!isDupla);
+  document.getElementById('titulo-modal').innerHTML=isDupla?'<i class="fa-solid fa-people-group mr-2"></i>Adicionar Dupla':'<i class="fa-solid fa-plus mr-2"></i>Adicionar Equipe';
+}
 function renderEquipe(){
-  const blocos = {
-    'lista-casal-diretor': equipe.filter(e => e.funcao.includes('Casal Diretor') || e.funcao === 'Diretor' || e.funcao === 'Diretora'),
-    'lista-coordenador': equipe.filter(e => e.funcao === 'Coordenador' || e.funcao === 'Coordenador(a)' || e.funcao === 'Coordenador' || e.funcao.toLowerCase().includes('coordenador') &&!e.funcao.toLowerCase().includes('assistente')),
-    'lista-assistentes': equipe.filter(e => e.funcao.toLowerCase().includes('assistente')),
-    'lista-consultores': equipe.filter(e => e.funcao.toLowerCase().includes('consultor'))
-  };
-  blocos['lista-coordenador'] = equipe.filter(e => {
-    const f = e.funcao.toLowerCase();
-    return (f === 'coordenador' || f === 'coordenador(a)' || f === 'coordenadora') &&!f.includes('assistente');
-  });
-  for(const [id, lista] of Object.entries(blocos)){
-    const el = document.getElementById(id);
-    if(lista.length === 0){
-      el.innerHTML = `<p class="text-sm text-gray-400 italic py-2">Nenhum membro cadastrado neste bloco</p>`;
-    } else {
-      el.innerHTML = lista.map(m => `
-        <div class="border rounded-xl p-3 flex justify-between items-center bg-gray-50">
-          <div>
-            <p class="font-semibold text-sm">${m.nome}</p>
-            <p class="text-xs text-gray-500">${m.funcao} ${m.companhia? '• '+m.companhia : ''}</p>
-          </div>
-          <button onclick="removerEquipe('${m.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash text-xs"></i></button>
-        </div>
-      `).join('');
-    }
-  }
+  const dir=equipe.filter(e=>e.funcao.includes('Casal Diretor')||e.funcao==='Diretor');
+  const coord=equipe.filter(e=>{const f=e.funcao.toLowerCase(); return (f==='coordenador'||f==='coordenador(a)'||f==='coordenadora')&&!f.includes('assistente')});
+  const assist=equipe.filter(e=>e.funcao.toLowerCase().includes('assistente'));
+  const cons=equipe.filter(e=>e.funcao.toLowerCase().includes('consultor'));
+  document.getElementById('lista-casal-diretor').innerHTML=dir.length?dir.map(m=>`<div class="border rounded-xl p-3 flex justify-between bg-gray-50"><div><p class="font-semibold text-sm">${m.nome}</p><p class="text-xs text-gray-500">${m.funcao}</p></div><button onclick="removerEquipe('${m.id}')" class="text-red-400"><i class="fa-solid fa-trash text-xs"></i></button></div>`).join(''):`<p class="text-sm text-gray-400 italic">Nenhum</p>`;
+  document.getElementById('lista-coordenador').innerHTML=coord.length?coord.map(m=>`<div class="border rounded-xl p-3 flex justify-between bg-gray-50"><div><p class="font-semibold text-sm">${m.nome}</p><p class="text-xs text-gray-500">${m.funcao}</p></div><button onclick="removerEquipe('${m.id}')" class="text-red-400"><i class="fa-solid fa-trash text-xs"></i></button></div>`).join(''):`<p class="text-sm text-gray-400 italic">Nenhum</p>`;
+  document.getElementById('lista-assistentes').innerHTML=assist.length?assist.map(m=>`<div class="border rounded-xl p-3 flex justify-between bg-gray-50"><div><p class="font-semibold text-sm">${m.nome}</p><p class="text-xs text-gray-500">${m.funcao}</p></div><button onclick="removerEquipe('${m.id}')" class="text-red-400"><i class="fa-solid fa-trash text-xs"></i></button></div>`).join(''):`<p class="text-sm text-gray-400 italic">Nenhum</p>`;
+  document.getElementById('lista-consultores').innerHTML=cons.length?cons.map(m=>`<div class="border-2 border-emerald-100 rounded-xl p-3 bg-emerald-50/50 flex justify-between"><div><p class="font-bold text-sm text-emerald-800"><i class="fa-solid fa-flag mr-1"></i>${m.nomeDupla||m.nome}</p><p class="text-xs mt-1"><i class="fa-solid fa-person text-blue-500 mr-1"></i> ${m.rapaz||m.nome}</p><p class="text-xs"><i class="fa-solid fa-person-dress text-pink-500 mr-1"></i> ${m.moca||''}</p></div><button onclick="removerEquipe('${m.id}')" class="text-red-400 h-fit"><i class="fa-solid fa-trash text-xs"></i></button></div>`).join(''):`<p class="text-sm text-gray-400 italic">Nenhuma dupla. Selecione "DUPLA"</p>`;
+  atualizarSelectDuplas();
+}
+function atualizarSelectDuplas(){
+  const duplas=equipe.filter(e=>e.funcao.toLowerCase().includes('consultor'));
+  const sel=document.getElementById('comp-dupla');
+  sel.innerHTML=duplas.length?'<option value="">Selecione a dupla...</option>'+duplas.map(d=>`<option value="${d.id}">${d.nomeDupla||d.nome} - ${d.rapaz||''} e ${d.moca||''}</option>`).join(''):'<option value="">Nenhuma dupla cadastrada</option>';
 }
 async function salvarEquipe(){
-  const nome = document.getElementById('eq-nome').value.trim();
-  const funcao = document.getElementById('eq-funcao').value;
-  const companhia = document.getElementById('eq-companhia').value.trim();
-  if(!nome) return alert('Digite o nome');
-  await window.fb.addDoc(window.fb.collection(window.db, 'equipe'), {nome, funcao, companhia, criadoEm: Date.now()});
-  document.getElementById('eq-nome').value=''; document.getElementById('eq-companhia').value='';
+  const funcao=document.getElementById('eq-funcao').value;
+  if(funcao==='Consultor'){
+    const nomeDupla=document.getElementById('dupla-nome').value.trim();
+    const rapaz=document.getElementById('dupla-rapaz').value.trim();
+    const moca=document.getElementById('dupla-moca').value.trim();
+    if(!nomeDupla||!rapaz||!moca) return alert('Preencha nome da dupla, rapaz e moça');
+    await window.fb.addDoc(window.fb.collection(window.db,'equipe'),{nome:nomeDupla,nomeDupla,rapaz,moca,funcao,criadoEm:Date.now()});
+    document.getElementById('dupla-nome').value=''; document.getElementById('dupla-rapaz').value=''; document.getElementById('dupla-moca').value='';
+  }else{
+    const nome=document.getElementById('eq-nome').value.trim();
+    const companhia=document.getElementById('eq-companhia').value.trim();
+    if(!nome) return alert('Digite o nome');
+    await window.fb.addDoc(window.fb.collection(window.db,'equipe'),{nome,funcao,companhia,criadoEm:Date.now()});
+    document.getElementById('eq-nome').value=''; document.getElementById('eq-companhia').value='';
+  }
   document.getElementById('modalEquipe').classList.add('hidden');
 }
-async function removerEquipe(id){
-  if(!confirm('Remover?')) return;
-  await window.fb.deleteDoc(window.fb.doc(window.db, 'equipe', id));
+async function salvarCompanhia(){
+  const nome=document.getElementById('comp-nome').value.trim();
+  const duplaId=document.getElementById('comp-dupla').value;
+  if(!nome||!duplaId) return alert('Preencha tudo');
+  const dupla=equipe.find(e=>e.id===duplaId);
+  await window.fb.addDoc(window.fb.collection(window.db,'companhias'),{nome,duplaId,nomeDupla:dupla.nomeDupla||dupla.nome,lideres:(dupla.rapaz||'')+' e '+(dupla.moca||''),criadoEm:Date.now()});
+  document.getElementById('comp-nome').value=''; document.getElementById('modalCompanhia').classList.add('hidden');
 }
+function renderCompanhias(){
+  const el=document.getElementById('lista-companhias-tab');
+  el.innerHTML=companhias.length?companhias.map(c=>`<div class="border rounded-xl p-3 bg-gray-50 flex justify-between"><div><p class="font-bold text-sm">${c.nome}</p><p class="text-xs text-blue-600">${c.nomeDupla}</p><p class="text-xs text-gray-500">${c.lideres}</p></div><button onclick="removerCompanhia('${c.id}')" class="text-red-400"><i class="fa-solid fa-trash text-xs"></i></button></div>`).join(''):`<p class="text-sm text-gray-400">Nenhuma companhia ainda</p>`;
+}
+async function removerEquipe(id){ if(!confirm('Remover?')) return; await window.fb.deleteDoc(window.fb.doc(window.db,'equipe',id)); }
+async function removerCompanhia(id){ if(!confirm('Remover companhia?')) return; await window.fb.deleteDoc(window.fb.doc(window.db,'companhias',id)); }
 function iniciarSync(){
-  window.fb.onSnapshot(window.fb.collection(window.db, 'equipe'), (snap)=>{
-    equipe = snap.docs.map(d=>({id:d.id,...d.data()}));
-    renderEquipe();
-  });
+  window.fb.onSnapshot(window.fb.collection(window.db,'equipe'),(snap)=>{equipe=snap.docs.map(d=>({id:d.id,...d.data()})); renderEquipe();});
+  window.fb.onSnapshot(window.fb.collection(window.db,'companhias'),(snap)=>{companhias=snap.docs.map(d=>({id:d.id,...d.data()})); renderCompanhias();});
 }
-window.addEventListener('load', ()=>{
-  setTimeout(iniciarSync, 800);
-  showTab('equipe');
-});
+window.addEventListener('load',()=>{setTimeout(iniciarSync,800); showTab('equipe');});
 </script>
 </body>
 </html>
